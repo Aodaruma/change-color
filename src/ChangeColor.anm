@@ -124,13 +124,22 @@ end
 
 -- debug_print(tostring(af[1]))
 local col = ipFunc(col1, col2, af, typeIp)
-debug_print(("0x%02x, 0x%02x --(%s(%f))--> 0x%02x"):format(col1, col2, interpolator_names[typeCS], af[1], col))
+-- debug_print(("0x%02x, 0x%02x --(%s(%f))--> 0x%02x"):format(col1, col2, interpolator_names[typeCS], af[1], col))
 
 obj.effect("単色化", "color", col, "強さ", intensity * 100, "輝度を保持する", 0)
 
 ------------------------------
 -- show information dialog
 if showInfo then
+    local light, dark = 0xffffff, 0x000000
+    local letterColor
+    local h, s, v = HSV(col)
+    if v > 50 then
+        letterColor = dark
+    else
+        letterColor = light
+    end
+
     obj.copybuffer("tmp", "obj")
     obj.setoption("dst", "tmp")
 
@@ -142,7 +151,11 @@ if showInfo then
     text = text .. "}\n"
     text = text .. "色空間: " .. interpolator_names[typeCS] .. "\n"
     text = text .. "補間方法: " .. typeIp .. "\n"
-    text = text .. "色配列: " .. table.concat(colors, ", ") .. "\n"
+    text = text .. "色配列: "
+    for i = 1, #colors do
+        text = text .. ("0x%02x, "):format(colors[i])
+    end
+    text = text .. "\n"
     text = text .. "ｲｰｼﾞﾝｸﾞ: "
     if type(easing) == "number" then
         if easing > 1 then
@@ -168,7 +181,7 @@ if showInfo then
     end
     text = text .. "\n"
 
-    obj.setfont("メイリオ", 20)
+    obj.setfont("メイリオ", 20, 0, letterColor)
     obj.load(text)
     obj.draw()
 
