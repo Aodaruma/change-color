@@ -292,9 +292,9 @@ local function checkAF(af, num)
         if type(af[i]) ~= "number" then
             error(("checkAFerror: element %d is not a number; got %s"):format(i, type(af[i])))
         end
-        if af[i] < 0 or af[i] > 1 then
-            error(("checkAFerror: element %d is not in [0, 1]; got %f"):format(i, af[i]))
-        end
+        -- if af[i] < 0 or af[i] > 1 then
+        --     error(("checkAFerror: element %d is not in [0, 1]; got %f"):format(i, af[i]))
+        -- end
     end
 end
 
