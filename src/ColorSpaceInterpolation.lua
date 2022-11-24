@@ -275,8 +275,8 @@ local function checkValidCode(code)
     if type(code) ~= "number" then
         error("checkValidCodeError: code is not a number")
     end
-    if code < 0 or code > 255 then
-        error("checkValidCodeError: invalid code, code should be in [0, 255]")
+    if code < 0x000000 or code > 0xffffff then
+        error(("checkValidCodeError: invalid code, code should be in [0x000000, 0xffffff]; but got 0x%x").format(code))
     end
 end
 
