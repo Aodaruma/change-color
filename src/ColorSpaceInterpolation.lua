@@ -374,13 +374,19 @@ local function iHSV(code1, code2, af, ipType)
 end
 
 local function iHSL(code1, code2, af, ipType)
+    local CS_VARIABLE_NUM = 3
+    checkValidCode(code1)
+    checkValidCode(code2)
+    checkAF(af, CS_VARIABLE_NUM)
+    checkIpType(ipType)
     local h1, s1, v1 = HSV(code1)
     local h2, s2, v2 = HSV(code2)
-    local l1, l2 = (2 - v1) * s1 / 2, (2 - v2) * s2 / 2
+    -- s1,s2,v1,v2 is range in [0, 100], so we need to set range of l1,l2 to [0, 100]
+    local l1, l2 = (200 - s1) * v1 / 2, (200 - s2) * v2 / 2
 
     local h
-    local l = l1 + (l2 - l1) * af[2]
     local s = s1 + (s2 - s1) * af[3]
+    local l = l1 + (l2 - l1) * af[2]
 
     if ipType == 1 then
         -- farthest
@@ -415,7 +421,7 @@ local function iHSL(code1, code2, af, ipType)
             h = h1 + (h2 - h1) * af[1]
         end
     end
-    local v = (l + s) / 2
+    local v = l * 2 / (200 - s)
     return HSV(h, s, v)
 end
 
