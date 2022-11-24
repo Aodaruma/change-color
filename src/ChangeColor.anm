@@ -132,12 +132,34 @@ obj.effect("単色化", "color", col, "強さ", intensity * 100, "輝度を保持する", 0)
 -- show information dialog
 if showInfo then
     local text = "ChangeColor.anm @ " .. obj.layer .. ":\n"
-    text = text .. "強度: " .. intensity * 100 .. "%" .. "\n"
-    text = text .. "AF: " .. paramAF * 100 .. "%" .. "\n"
-    text = text .. "色空間: " .. typeCS .. "\n"
+    text = text .. "AF: {"
+    for i = 1, requiredAFnum do
+        text = text .. af[i] .. ", "
+    end
+    text = text .. "}\n"
+    text = text .. "色空間: " .. interpolator_names[typeCS] .. "\n"
     text = text .. "補間方法: " .. typeIp .. "\n"
     text = text .. "色配列: " .. table.concat(colors, ", ") .. "\n"
-    text = text .. "ｲｰｼﾞﾝｸﾞ: " .. easing .. "\n"
+    text = text .. "ｲｰｼﾞﾝｸﾞ: "
+    if type(easing) == "number" then
+        if easing > 1 then
+            text = text .. "Easing #" .. easing
+        elseif easing < 0 then
+            text = text .. "MultiBezier #" .. -easing
+        end
+    else
+        text = text .. "{ "
+        for i = 1, requiredAFnum do
+            local e = easing[i]
+            if e > 1 then
+                text = text .. "Easing #" .. e .. ", "
+            elseif e < 0 then
+                text = text .. "MultiBezier #" .. -e .. ", "
+            end
+        end
+        text = text .. "}"
+    end
+    text = text .. "\n"
 
     obj.setfont("メイリオ", 20)
     obj.load(text)
