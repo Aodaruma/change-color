@@ -280,9 +280,21 @@ local function checkValidCode(code)
     end
 end
 
-local function checkElementNum(list, num)
-    if #list ~= num then
-        error("valElementNumError: element number is not " .. num)
+local function checkAF(af, num)
+    if type(af) ~= "table" then
+        error(("checkAFerror: af is not a table; got %s"):format(type(af)))
+    end
+    if #af ~= num then
+        error("checkAFerror: element number is not " .. num)
+    end
+
+    for i = 1, num do
+        if type(af[i]) ~= "number" then
+            error(("checkAFerror: element %d is not a number; got %s"):format(i, type(af[i])))
+        end
+        if af[i] < 0 or af[i] > 1 then
+            error(("checkAFerror: element %d is not in [0, 1]; got %f"):format(i, af[i]))
+        end
     end
 end
 
@@ -293,7 +305,7 @@ local function iRGB(code1, code2, af)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
-    checkElementNum(af, CS_VARIABLE_NUM)
+    checkAF(af, CS_VARIABLE_NUM)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -308,7 +320,7 @@ local function iHSV(code1, code2, af)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
-    checkElementNum(af, CS_VARIABLE_NUM)
+    checkAF(af, CS_VARIABLE_NUM)
 
     local h1, s1, v1 = HSV(code1)
     local h2, s2, v2 = HSV(code2)
@@ -334,7 +346,7 @@ local function iYUV(code1, code2, af)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
-    checkElementNum(af, CS_VARIABLE_NUM)
+    checkAF(af, CS_VARIABLE_NUM)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -355,7 +367,7 @@ local function iYCbCr(code1, code2, af)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
-    checkElementNum(af, CS_VARIABLE_NUM)
+    checkAF(af, CS_VARIABLE_NUM)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -376,7 +388,7 @@ local function iXYZ(code1, code2, af)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
-    checkElementNum(af, CS_VARIABLE_NUM)
+    checkAF(af, CS_VARIABLE_NUM)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -397,7 +409,7 @@ local function iCIELAB(code1, code2, af)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
-    checkElementNum(af, CS_VARIABLE_NUM)
+    checkAF(af, CS_VARIABLE_NUM)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -423,7 +435,7 @@ local function iOklab(code1, code2, af)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
-    checkElementNum(af, CS_VARIABLE_NUM)
+    checkAF(af, CS_VARIABLE_NUM)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -449,7 +461,7 @@ local function iYIQ(code1, code2, af)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
-    checkElementNum(af, CS_VARIABLE_NUM)
+    checkAF(af, CS_VARIABLE_NUM)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -470,7 +482,7 @@ local function iCMYK(code1, code2, af)
     local CS_VARIABLE_NUM = 4
     checkValidCode(code1)
     checkValidCode(code2)
-    checkElementNum(af, CS_VARIABLE_NUM)
+    checkAF(af, CS_VARIABLE_NUM)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -492,7 +504,7 @@ local function iHCT(code1, code2, af)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
-    checkElementNum(af, CS_VARIABLE_NUM)
+    checkAF(af, CS_VARIABLE_NUM)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
