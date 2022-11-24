@@ -1,0 +1,134 @@
+--[[
+This script is version 1.0. If it is outdated, please replace it with a newer script.
+We are not responsible for any damage caused by the use of this script.
+
+developed by Aodaruma (twitter: @Aodaruma_)
+]]
+
+--------------------------------------------------------------------
+--track0:強度(%),0,100,100
+--track1:AFall(%),0,9999.9,0
+--track2:色空間,0,11,0,1
+--track3:補間方法,0,3,0,1
+--check0:showInfo,1
+--dialog:色配列,_1={0xd05232,0xb2311b,0x140f2d,0xebff00,0x2ca58d,0x84bc9c,0xfffdf7};ｲｰｼﾞﾝｸﾞ,_2=1;
+--------------------------------------------------------------------
+
+------------------------------
+-- import libraries
+local CSI = require("ColorSpaceInterpolation")
+local E = require("easing_aviutl")
+local intepolators = CSI.interpolators
+
+------------------------------
+-- get parameters
+local intensity, paramAF, typeCS, typeIp = obj.track0 / 100, obj.track1 / 100, obj.track2, obj.track3
+local showInfo = obj.check0
+local colors, easing = _1, _2
+_1, _2 = nil, nil
+
+local interpolator = intepolators[typeCS]
+local ipFunc = interpolator[1]
+local requiredAFnum = interpolator[2]
+
+------------------------------
+-- check parameters and libraries
+local function checker()
+    if type(CSI) ~= "table" then
+        error("ColorSpaceInterpolation.luaがロードされませんでした。ファイルが正しい場所に配置されているか、確認してください。")
+    end
+
+    if type(colors) ~= "table" then
+        error("色配列には、テーブルで値を入力してください。")
+    end
+    if #colors < 2 then
+        error("色配列には、2つ以上の色を指定してください。")
+    end
+    if type(easing) == "number" then
+        if easing < -10 or easing > 36 or easing % 1 ~= 0 then
+            error("イージングを数として入力するには、-10から36の整数を指定してください。")
+        end
+        if easing > 1 and type(E) ~= "table" then
+            error("easing_aviutl.luaがロードされませんでした。ファイルが正しい場所に配置されているか、確認してください。")
+        elseif easing < 0 and type(Bezier_flow) ~= "table" then
+            error("マルチベジェ軌道スクリプト用の変数が設定されていません。該当スクリプトが実行されているか確認してください。")
+        end
+    elseif type(easing) == "table" then
+        if #easing ~= requiredAFnum then
+            error("イージングにテーブルとして入力するには、" .. requiredAFnum .. "個の値を指定してください。")
+        end
+        for i = 1, requiredAFnum do
+            local e = easing[i]
+            if type(e) ~= "number" then
+                error("イージングのテーブルのそれぞれの要素には、必ず整数を入力してください。")
+            end
+            if e < -10 or e > 36 or e % 1 ~= 0 then
+                error("イージングのテーブルのそれぞれの数値は、-10から36の整数を指定してください。")
+            end
+            if e > 1 and type(E) ~= "table" then
+                error("easing_aviutl.luaがロードされませんでした。ファイルが正しい場所に配置されているか、確認してください。")
+            elseif e < 0 and type(Bezier_flow) ~= "table" then
+                error("マルチベジェ軌道スクリプト用の変数が設定されていません。該当スクリプトが実行されているか確認してください。")
+            end
+        end
+    else
+        error("イージングには、テーブルまたは整数を指定してください。")
+    end
+end
+
+local status, result = pcall(checker)
+if not status then
+    obj.setfont("メイリオ", 20)
+    obj.load("<#ff0000>ChangeColor.anm @ " .. obj.layer .. ":\n" .. result)
+    error(result)
+end
+
+------------------------------
+-- main
+local mAF, eAF = math.modf(paramAF)
+local col1, col2 = colors[(mAF + 1) % #colors], colors[(mAF + 2) % #colors]
+
+local af = {}
+if type(easing) == "number" then
+    local tmp = eAF
+    if easing > 1 then
+        tmp = E.easing(easing, eAF)
+    elseif easing < 0 then
+        tmp = Bezier_flow.time(-easing, eAF)
+    elseif easing == 1 then
+        tmp = eAF -- linear
+    else
+        tmp = 0 -- no animation
+    end
+    for i = 1, requiredAFnum do
+        af[i] = tmp
+    end
+elseif type(easing) == "table" then
+    for i = 1, requiredAFnum do
+        local e = easing[i]
+        if e > 1 then
+            af[i] = E.easing(e, eAF)
+        elseif e < 0 then
+            af[i] = Bezier_flow.time(-e, eAF)
+        elseif e == 1 then
+            af[i] = eAF -- linear
+        else
+            af[i] = 0 -- no animation
+        end
+    end
+end
+
+local col = ipFunc(col1, col2, af)
+
+obj.effect("単色化", "color", col "強さ", intensity * 100, "輝度を保持する", 0)
+
+------------------------------
+-- show information dialog
+if showInfo then
+    obj.text("強度: " .. intensity * 100 .. "%")
+    obj.text("AF: " .. paramAF * 100 .. "%")
+    obj.text("色空間: " .. typeCS)
+    obj.text("補間方法: " .. typeIp)
+    obj.text("色配列: " .. table.concat(colors, ", "))
+    obj.text("ｲｰｼﾞﾝｸﾞ: " .. easing)
+end
