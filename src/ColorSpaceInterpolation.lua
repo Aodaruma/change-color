@@ -298,6 +298,12 @@ local function checkAF(af, num)
     end
 end
 
+local function checkIpType(ipType)
+    if type(ipType) ~= "number" then
+        error(("checkIpTypeError: ipType is not a number; got %s"):format(type(ipType)))
+    end
+end
+
 -------------------------------------------------------------------------------
 -- color code interpolation functions
 -------------------------------------------------------------------------------
