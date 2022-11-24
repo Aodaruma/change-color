@@ -20,6 +20,11 @@ AviUtl script that allows to change color of a object with various color space a
     - 色変化を行う色空間を指定します。
   - 補間方法
     - 特定の色空間上で、変数の変化の仕方を指定します。
+      - `HSV`, `HSL`, `HCT`の場合、色相`Hue`を次の通りに変化させます。
+          1. Nearest, 最寄りのルートで補間します。
+          2. Farthest, 最も通いルートで補間します。
+          3. Clockwise, 時計回りのルートで補間します。
+          4. Counter-Clockwise, 反時計回りのルートで補間します。
   - showInfo
     - スクリプトやパラメーターの情報について表示します。
 
