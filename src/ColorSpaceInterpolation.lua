@@ -229,7 +229,7 @@ local function Oklab2XYZ(oklab, xyz)
     xyz[3] = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s
 end
 
-local function RGB2HCT(rgb, hct)
+local function RGB2HCT(rgb, hct, ipType)
     --referenced: https://material.io/blog/science-of-color-design
     local yiq = { 0, 0, 0 }
     RGB2YIQ(rgb, yiq)
@@ -307,11 +307,12 @@ end
 -------------------------------------------------------------------------------
 -- color code interpolation functions
 -------------------------------------------------------------------------------
-local function iRGB(code1, code2, af)
+local function iRGB(code1, code2, af, ipType)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
     checkAF(af, CS_VARIABLE_NUM)
+    checkIpType(ipType)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -322,37 +323,108 @@ local function iRGB(code1, code2, af)
     return RGB(r, g, b)
 end
 
-local function iHSV(code1, code2, af)
+local function iHSV(code1, code2, af, ipType)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
     checkAF(af, CS_VARIABLE_NUM)
+    checkIpType(ipType)
 
     local h1, s1, v1 = HSV(code1)
     local h2, s2, v2 = HSV(code2)
 
-    local h = h1 + (h2 - h1) * af[1] / 100
-    local s = s1 + (s2 - s1) * af[2] / 100
-    local v = v1 + (v2 - v1) * af[3] / 100
+    local h
+    local s = s1 + (s2 - s1) * af[2]
+    local v = v1 + (v2 - v1) * af[3]
+
+    if ipType == 1 then
+        -- farthest
+        if h2 - h1 > 180 then
+            h = h1 + (h2 - h1 + 360) * af[1]
+        elseif h2 - h1 < -180 then
+            h = h1 + (h2 - h1 - 360) * af[1]
+        else
+            h = h1 + (h2 - h1) * af[1]
+        end
+    elseif ipType == 2 then
+        -- clockwise
+        if h2 - h1 < 0 then
+            h = h1 + (h2 - h1 + 360) * af[1]
+        else
+            h = h1 + (h2 - h1) * af[1]
+        end
+    elseif ipType == 3 then
+        -- counterclockwise
+        if h2 - h1 > 0 then
+            h = h1 + (h2 - h1 - 360) * af[1]
+        else
+            h = h1 + (h2 - h1) * af[1]
+        end
+    else
+        -- nearest
+        if h2 - h1 > 180 then
+            h = h1 + (h2 - h1 - 360) * af[1]
+        elseif h2 - h1 < -180 then
+            h = h1 + (h2 - h1 + 360) * af[1]
+        else
+            h = h1 + (h2 - h1) * af[1]
+        end
+    end
     return HSV(h, s, v)
 end
 
-local function iHSL(code1, code2, af)
+local function iHSL(code1, code2, af, ipType)
     local h1, s1, v1 = HSV(code1)
     local h2, s2, v2 = HSV(code2)
     local l1, l2 = (2 - v1) * s1 / 2, (2 - v2) * s2 / 2
 
-    local h = h1 + (h2 - h1) * af[1] / 100
-    local l = l1 + (l2 - l1) * af[2] / 100
-    local s = s1 + (s2 - s1) * af[3] / 100
-    return HSL(h, s, l)
+    local h
+    local l = l1 + (l2 - l1) * af[2]
+    local s = s1 + (s2 - s1) * af[3]
+
+    if ipType == 1 then
+        -- farthest
+        if h2 - h1 > 180 then
+            h = h1 + (h2 - h1 + 360) * af[1]
+        elseif h2 - h1 < -180 then
+            h = h1 + (h2 - h1 - 360) * af[1]
+        else
+            h = h1 + (h2 - h1) * af[1]
+        end
+    elseif ipType == 2 then
+        -- clockwise
+        if h2 - h1 < 0 then
+            h = h1 + (h2 - h1 + 360) * af[1]
+        else
+            h = h1 + (h2 - h1) * af[1]
+        end
+    elseif ipType == 3 then
+        -- counterclockwise
+        if h2 - h1 > 0 then
+            h = h1 + (h2 - h1 - 360) * af[1]
+        else
+            h = h1 + (h2 - h1) * af[1]
+        end
+    else
+        -- nearest
+        if h2 - h1 > 180 then
+            h = h1 + (h2 - h1 - 360) * af[1]
+        elseif h2 - h1 < -180 then
+            h = h1 + (h2 - h1 + 360) * af[1]
+        else
+            h = h1 + (h2 - h1) * af[1]
+        end
+    end
+    local v = (l + s) / 2
+    return HSV(h, s, v)
 end
 
-local function iYUV(code1, code2, af)
+local function iYUV(code1, code2, af, ipType)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
     checkAF(af, CS_VARIABLE_NUM)
+    checkIpType(ipType)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -369,11 +441,12 @@ local function iYUV(code1, code2, af)
     return RGB(rgb[1], rgb[2], rgb[3])
 end
 
-local function iYCbCr(code1, code2, af)
+local function iYCbCr(code1, code2, af, ipType)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
     checkAF(af, CS_VARIABLE_NUM)
+    checkIpType(ipType)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -390,11 +463,12 @@ local function iYCbCr(code1, code2, af)
     return RGB(rgb[1], rgb[2], rgb[3])
 end
 
-local function iXYZ(code1, code2, af)
+local function iXYZ(code1, code2, af, ipType)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
     checkAF(af, CS_VARIABLE_NUM)
+    checkIpType(ipType)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -411,11 +485,12 @@ local function iXYZ(code1, code2, af)
     return RGB(rgb[1], rgb[2], rgb[3])
 end
 
-local function iCIELAB(code1, code2, af)
+local function iCIELAB(code1, code2, af, ipType)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
     checkAF(af, CS_VARIABLE_NUM)
+    checkIpType(ipType)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -437,11 +512,12 @@ local function iCIELAB(code1, code2, af)
     return RGB(rgb[1], rgb[2], rgb[3])
 end
 
-local function iOklab(code1, code2, af)
+local function iOklab(code1, code2, af, ipType)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
     checkAF(af, CS_VARIABLE_NUM)
+    checkIpType(ipType)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -463,11 +539,12 @@ local function iOklab(code1, code2, af)
     return RGB(rgb[1], rgb[2], rgb[3])
 end
 
-local function iYIQ(code1, code2, af)
+local function iYIQ(code1, code2, af, ipType)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
     checkAF(af, CS_VARIABLE_NUM)
+    checkIpType(ipType)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -484,11 +561,12 @@ local function iYIQ(code1, code2, af)
     return RGB(rgb[1], rgb[2], rgb[3])
 end
 
-local function iCMYK(code1, code2, af)
+local function iCMYK(code1, code2, af, ipType)
     local CS_VARIABLE_NUM = 4
     checkValidCode(code1)
     checkValidCode(code2)
     checkAF(af, CS_VARIABLE_NUM)
+    checkIpType(ipType)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -506,11 +584,12 @@ local function iCMYK(code1, code2, af)
     return RGB(rgb[1], rgb[2], rgb[3])
 end
 
-local function iHCT(code1, code2, af)
+local function iHCT(code1, code2, af, ipType)
     local CS_VARIABLE_NUM = 3
     checkValidCode(code1)
     checkValidCode(code2)
     checkAF(af, CS_VARIABLE_NUM)
+    checkIpType(ipType)
 
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
@@ -518,9 +597,44 @@ local function iHCT(code1, code2, af)
     RGB2HCT({ r1, g1, b1 }, hct1)
     RGB2HCT({ r2, g2, b2 }, hct2)
 
-    local h = hct1[1] + (hct2[1] - hct1[1]) * af[1] / 100
-    local c = hct1[2] + (hct2[2] - hct1[2]) * af[2] / 100
-    local t = hct1[3] + (hct2[3] - hct1[3]) * af[3] / 100
+    local h
+    local c = hct1[2] + (hct2[2] - hct1[2]) * af[2]
+    local t = hct1[3] + (hct2[3] - hct1[3]) * af[3]
+
+    local h1, h2 = hct1[1], hct2[1]
+    if ipType == 1 then
+        -- farthest
+        if h2 - h1 > 180 then
+            h = h1 + (h2 - h1 + 360) * af[1]
+        elseif h2 - h1 < -180 then
+            h = h1 + (h2 - h1 - 360) * af[1]
+        else
+            h = h1 + (h2 - h1) * af[1]
+        end
+    elseif ipType == 2 then
+        -- clockwise
+        if h2 - h1 < 0 then
+            h = h1 + (h2 - h1 + 360) * af[1]
+        else
+            h = h1 + (h2 - h1) * af[1]
+        end
+    elseif ipType == 3 then
+        -- counterclockwise
+        if h2 - h1 > 0 then
+            h = h1 + (h2 - h1 - 360) * af[1]
+        else
+            h = h1 + (h2 - h1) * af[1]
+        end
+    else
+        -- nearest
+        if h2 - h1 > 180 then
+            h = h1 + (h2 - h1 - 360) * af[1]
+        elseif h2 - h1 < -180 then
+            h = h1 + (h2 - h1 + 360) * af[1]
+        else
+            h = h1 + (h2 - h1) * af[1]
+        end
+    end
 
     local rgb = { 0, 0, 0 }
     HCT2RGB({ h, c, t }, rgb)
