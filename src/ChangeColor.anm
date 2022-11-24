@@ -131,10 +131,14 @@ obj.effect("単色化", "color", col, "強さ", intensity * 100, "輝度を保持する", 0)
 ------------------------------
 -- show information dialog
 if showInfo then
-    obj.text("強度: " .. intensity * 100 .. "%")
-    obj.text("AF: " .. paramAF * 100 .. "%")
-    obj.text("色空間: " .. typeCS)
-    obj.text("補間方法: " .. typeIp)
-    obj.text("色配列: " .. table.concat(colors, ", "))
-    obj.text("ｲｰｼﾞﾝｸﾞ: " .. easing)
+    local text = "ChangeColor.anm @ " .. obj.layer .. ":\n"
+    text = text .. "強度: " .. intensity * 100 .. "%" .. "\n"
+    text = text .. "AF: " .. paramAF * 100 .. "%" .. "\n"
+    text = text .. "色空間: " .. typeCS .. "\n"
+    text = text .. "補間方法: " .. typeIp .. "\n"
+    text = text .. "色配列: " .. table.concat(colors, ", ") .. "\n"
+    text = text .. "ｲｰｼﾞﾝｸﾞ: " .. easing .. "\n"
+
+    obj.setfont("メイリオ", 20)
+    obj.load(text)
 end
