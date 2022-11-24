@@ -131,7 +131,10 @@ obj.effect("単色化", "color", col, "強さ", intensity * 100, "輝度を保持する", 0)
 ------------------------------
 -- show information dialog
 if showInfo then
-    local text = "ChangeColor.anm @ " .. obj.layer .. ":\n"
+    obj.copybuffer("tmp", "obj")
+    obj.setoption("dst", "tmp")
+
+    local text = "ChangeColor.anm @ layer" .. obj.layer .. ":\n"
     text = text .. "AF: {"
     for i = 1, requiredAFnum do
         text = text .. af[i] .. ", "
@@ -146,6 +149,10 @@ if showInfo then
             text = text .. "Easing #" .. easing
         elseif easing < 0 then
             text = text .. "MultiBezier #" .. -easing
+        elseif easing == 1 then
+            text = text .. "Linear"
+        else
+            text = text .. "No Animation"
         end
     else
         text = text .. "{ "
@@ -163,4 +170,9 @@ if showInfo then
 
     obj.setfont("メイリオ", 20)
     obj.load(text)
+    obj.draw()
+
+    obj.setoption("dst", "frm")
+    obj.copybuffer("obj", "tmp")
+    obj.draw()
 end
