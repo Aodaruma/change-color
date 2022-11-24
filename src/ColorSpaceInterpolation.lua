@@ -317,9 +317,9 @@ local function iRGB(code1, code2, af, ipType)
     local r1, g1, b1 = RGB(code1)
     local r2, g2, b2 = RGB(code2)
 
-    local r = r1 + (r2 - r1) * af[1] / 100
-    local g = g1 + (g2 - g1) * af[2] / 100
-    local b = b1 + (b2 - b1) * af[3] / 100
+    local r = r1 + (r2 - r1) * af[1]
+    local g = g1 + (g2 - g1) * af[2]
+    local b = b1 + (b2 - b1) * af[3]
     return RGB(r, g, b)
 end
 
@@ -432,9 +432,9 @@ local function iYUV(code1, code2, af, ipType)
     RGB2YUV({ r1, g1, b1 }, yuv1)
     RGB2YUV({ r2, g2, b2 }, yuv2)
 
-    local y = yuv1[1] + (yuv2[1] - yuv1[1]) * af[1] / 100
-    local u = yuv1[2] + (yuv2[2] - yuv1[2]) * af[2] / 100
-    local v = yuv1[3] + (yuv2[3] - yuv1[3]) * af[3] / 100
+    local y = yuv1[1] + (yuv2[1] - yuv1[1]) * af[1]
+    local u = yuv1[2] + (yuv2[2] - yuv1[2]) * af[2]
+    local v = yuv1[3] + (yuv2[3] - yuv1[3]) * af[3]
 
     local rgb = { 0, 0, 0 }
     YUV2RGB({ y, u, v }, rgb)
@@ -454,9 +454,9 @@ local function iYCbCr(code1, code2, af, ipType)
     RGB2YCbCr({ r1, g1, b1 }, ycbcr1)
     RGB2YCbCr({ r2, g2, b2 }, ycbcr2)
 
-    local y = ycbcr1[1] + (ycbcr2[1] - ycbcr1[1]) * af[1] / 100
-    local cb = ycbcr1[2] + (ycbcr2[2] - ycbcr1[2]) * af[2] / 100
-    local cr = ycbcr1[3] + (ycbcr2[3] - ycbcr1[3]) * af[3] / 100
+    local y = ycbcr1[1] + (ycbcr2[1] - ycbcr1[1]) * af[1]
+    local cb = ycbcr1[2] + (ycbcr2[2] - ycbcr1[2]) * af[2]
+    local cr = ycbcr1[3] + (ycbcr2[3] - ycbcr1[3]) * af[3]
 
     local rgb = { 0, 0, 0 }
     YCbCr2RGB({ y, cb, cr }, rgb)
@@ -476,9 +476,9 @@ local function iXYZ(code1, code2, af, ipType)
     RGB2XYZ({ r1, g1, b1 }, xyz1)
     RGB2XYZ({ r2, g2, b2 }, xyz2)
 
-    local x = xyz1[1] + (xyz2[1] - xyz1[1]) * af[1] / 100
-    local y = xyz1[2] + (xyz2[2] - xyz1[2]) * af[2] / 100
-    local z = xyz1[3] + (xyz2[3] - xyz1[3]) * af[3] / 100
+    local x = xyz1[1] + (xyz2[1] - xyz1[1]) * af[1]
+    local y = xyz1[2] + (xyz2[2] - xyz1[2]) * af[2]
+    local z = xyz1[3] + (xyz2[3] - xyz1[3]) * af[3]
 
     local rgb = { 0, 0, 0 }
     XYZ2RGB({ x, y, z }, rgb)
@@ -501,9 +501,9 @@ local function iCIELAB(code1, code2, af, ipType)
     XYZ2CIELAB(xyz1, lab1)
     XYZ2CIELAB(xyz2, lab2)
 
-    local l = lab1[1] + (lab2[1] - lab1[1]) * af[1] / 100
-    local a = lab1[2] + (lab2[2] - lab1[2]) * af[2] / 100
-    local b = lab1[3] + (lab2[3] - lab1[3]) * af[3] / 100
+    local l = lab1[1] + (lab2[1] - lab1[1]) * af[1]
+    local a = lab1[2] + (lab2[2] - lab1[2]) * af[2]
+    local b = lab1[3] + (lab2[3] - lab1[3]) * af[3]
 
     local xyz = { 0, 0, 0 }
     local rgb = { 0, 0, 0 }
@@ -528,9 +528,9 @@ local function iOklab(code1, code2, af, ipType)
     XYZ2Oklab(xyz1, lab1)
     XYZ2Oklab(xyz2, lab2)
 
-    local l = lab1[1] + (lab2[1] - lab1[1]) * af[1] / 100
-    local a = lab1[2] + (lab2[2] - lab1[2]) * af[2] / 100
-    local b = lab1[3] + (lab2[3] - lab1[3]) * af[3] / 100
+    local l = lab1[1] + (lab2[1] - lab1[1]) * af[1]
+    local a = lab1[2] + (lab2[2] - lab1[2]) * af[2]
+    local b = lab1[3] + (lab2[3] - lab1[3]) * af[3]
 
     local xyz = { 0, 0, 0 }
     local rgb = { 0, 0, 0 }
@@ -552,9 +552,9 @@ local function iYIQ(code1, code2, af, ipType)
     RGB2YIQ({ r1, g1, b1 }, yiq1)
     RGB2YIQ({ r2, g2, b2 }, yiq2)
 
-    local y = yiq1[1] + (yiq2[1] - yiq1[1]) * af[1] / 100
-    local i = yiq1[2] + (yiq2[2] - yiq1[2]) * af[2] / 100
-    local q = yiq1[3] + (yiq2[3] - yiq1[3]) * af[3] / 100
+    local y = yiq1[1] + (yiq2[1] - yiq1[1]) * af[1]
+    local i = yiq1[2] + (yiq2[2] - yiq1[2]) * af[2]
+    local q = yiq1[3] + (yiq2[3] - yiq1[3]) * af[3]
 
     local rgb = { 0, 0, 0 }
     YIQ2RGB({ y, i, q }, rgb)
@@ -574,10 +574,10 @@ local function iCMYK(code1, code2, af, ipType)
     RGB2CMYK({ r1, g1, b1 }, cmyk1)
     RGB2CMYK({ r2, g2, b2 }, cmyk2)
 
-    local c = cmyk1[1] + (cmyk2[1] - cmyk1[1]) * af[1] / 100
-    local m = cmyk1[2] + (cmyk2[2] - cmyk1[2]) * af[2] / 100
-    local y = cmyk1[3] + (cmyk2[3] - cmyk1[3]) * af[3] / 100
-    local k = cmyk1[4] + (cmyk2[4] - cmyk1[4]) * af[4] / 100
+    local c = cmyk1[1] + (cmyk2[1] - cmyk1[1]) * af[1]
+    local m = cmyk1[2] + (cmyk2[2] - cmyk1[2]) * af[2]
+    local y = cmyk1[3] + (cmyk2[3] - cmyk1[3]) * af[3]
+    local k = cmyk1[4] + (cmyk2[4] - cmyk1[4]) * af[4]
 
     local rgb = { 0, 0, 0 }
     CMYK2RGB({ c, m, y, k }, rgb)
