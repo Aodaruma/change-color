@@ -8,7 +8,7 @@ developed by Aodaruma (twitter: @Aodaruma_)
 --------------------------------------------------------------------
 --track0:強度(%),0,100,100
 --track1:AF(%),0,9999.9,0
---track2:色空間,0,11,0,1
+--track2:色空間,1,12,0,1
 --track3:補間方法,0,3,0,1
 --check0:showInfo,1
 --dialog:色配列,_1={0xd05232,0xb2311b,0x140f2d,0xebff00,0x2ca58d,0x84bc9c,0xfffdf7};ｲｰｼﾞﾝｸﾞ,_2=1;
@@ -27,7 +27,11 @@ local showInfo = obj.check0
 local colors, easing = _1, _2
 _1, _2 = nil, nil
 
-local interpolator = intepolators[typeCS]
+local interpolator_names = {}
+for k, v in pairs(intepolators) do
+    table.insert(interpolator_names, k)
+end
+local interpolator = intepolators[interpolator_names[typeCS]]
 local ipFunc = interpolator[1]
 local requiredAFnum = interpolator[2]
 
@@ -86,13 +90,13 @@ end
 ------------------------------
 -- main
 local mAF, eAF = math.modf(paramAF)
-local col1, col2 = colors[(mAF + 1) % #colors], colors[(mAF + 2) % #colors]
+local col1, col2 = colors[mAF % #colors + 1], colors[(mAF + 1) % #colors + 1]
 
 local af = {}
 if type(easing) == "number" then
     local tmp = eAF
     if easing > 1 then
-        tmp = E.easing(easing, eAF)
+        tmp = E.easing(easing, eAF, 0, 1, 1, 1, 1, 1)
     elseif easing < 0 then
         tmp = Bezier_flow.time(-easing, eAF)
     elseif easing == 1 then
@@ -107,7 +111,7 @@ elseif type(easing) == "table" then
     for i = 1, requiredAFnum do
         local e = easing[i]
         if e > 1 then
-            af[i] = E.easing(e, eAF)
+            af[i] = E.easing(e, eAF, 0, 1, 1, 1, 1, 1)
         elseif e < 0 then
             af[i] = Bezier_flow.time(-e, eAF)
         elseif e == 1 then
@@ -118,9 +122,11 @@ elseif type(easing) == "table" then
     end
 end
 
-local col = ipFunc(col1, col2, af)
+-- debug_print(tostring(af[1]))
+local col = ipFunc(col1, col2, af, typeIp)
+debug_print(("0x%02x, 0x%02x --(%s(%f))--> 0x%02x"):format(col1, col2, interpolator_names[typeCS], af[1], col))
 
-obj.effect("単色化", "color", col "強さ", intensity * 100, "輝度を保持する", 0)
+obj.effect("単色化", "color", col, "強さ", intensity * 100, "輝度を保持する", 0)
 
 ------------------------------
 -- show information dialog
